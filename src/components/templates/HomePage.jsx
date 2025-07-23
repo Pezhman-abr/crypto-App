@@ -1,15 +1,42 @@
 import React, { useEffect, useState } from 'react'
+import { getCoinList } from '../../services/cryptoApi'
 import TableCoin from "../modules/TableCoin"
+import Pagination from '../modules/Pagination'
+import Search from '../modules/Search'
+import Chart from '../modules/Chart'
 
 function HomePage() {
     const [coins, setCoins] = useState([])
+    const [page, setPage] = useState(1)
+    const [currency, setCurrency] = useState("usd")
+    const [chart, setChart] = useState(null)
+
+    const [isLoading, setIsLoading] = useState(true)
     useEffect(() => {
-        fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&x_cg_demo_api_key=CG-xizUGLfenEMkrGVsBdEsnLW1").then(res => res.json()).then(json => setCoins(json)
-        )
-    },[])
+      setIsLoading(true)
+        const getData = async () => {
+          try {
+            const res = await fetch(getCoinList(page , currency))
+          const json = await res.json()
+          setCoins(json)
+          setIsLoading(false)
+          } catch (error) {
+            console.log("can not fetch data in API");
+            
+          }
+        }
+        getData()
+    },[page,currency])
     
   return (
-    <div><TableCoin coins={coins} /></div>
+    <>
+    <Search currency={currency} setCurrency={setCurrency} ></Search>
+    <div>
+      <TableCoin currency={currency} coins={coins} isLoading={isLoading} setChart={setChart} />
+    </div>
+    <Pagination page={page} setPage={setPage} />
+    {!!chart && <Chart chart={chart} setChart={setChart} />}
+    </>
   )
 }
 
