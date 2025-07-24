@@ -28,7 +28,6 @@ function Search({currency, setCurrency}) {
                 } else {
                     alert(json.status.error.messgae)
                 }
-            console.log(coins);
             
             } catch (error) {
                 if(error.name !== "AbortError") {
